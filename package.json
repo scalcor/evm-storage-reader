@@ -1,0 +1,42 @@
+{
+  "name": "evm-storage-reader",
+  "version": "0.1.0",
+  "description": "This library reads all storages of an EVM contract.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npx tsc -b",
+    "build:dev": "npx tsc -b -w",
+    "cover": "jest --coverage",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scalcor/evm-storage-reader.git"
+  },
+  "keywords": [
+    "contract",
+    "ethereum",
+    "evm"
+  ],
+  "tags": [
+    "contract",
+    "ethereum",
+    "evm",
+    "typescript"
+  ],
+  "author": "scalcor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scalcor/evm-storage-reader/issues"
+  },
+  "homepage": "https://github.com/scalcor/evm-storage-reader#readme",
+  "dependencies": {
+    "ethers": "^6.13.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  }
+}
