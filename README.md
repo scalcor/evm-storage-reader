@@ -14,11 +14,15 @@ npm install git://github.com/scalcor/evm-storage-reader.git
 
 ```typescript
 import { ethers } from "ethers";
-import { StorageReader } from "evm-storage-reader";
+import { readStorage } from "evm-storage-reader";
 
 const provider = ethers.getDefaultProvider();
-const address = "..." // contract's address
-const layout = {...} // contract's storage layout
+const address = "0x29Eb3b7895cc2C1ADF6FF1f313307aCc8E2b6147"; // contract's address
+const layout = { // contract's storage layout
+  storage: [{ label: "name", offset: 0, slot: "0", type: "t_string_storage" }],
+  types: { t_string_storage: { encoding: "bytes", label: "string", numberOfBytes: "32" } },
+};
+
 const result = await readStorage(provider, addr, layout);
 ```
 
@@ -36,14 +40,14 @@ solc --storage-layout contracts/MyContract.sol
 const reader = new StorageReader(provider, address, layout);
 
 // read from specific block
-await reader.read(undefined, undefined, "finalized");
-await reader.read(undefined, undefined, "0xab14df");
+await readStorage(provider, addr, layout, undefined, undefined, "finalized");
+await readStorage(provider, addr, layout, undefined, undefined, "0xab14df");
 
 // read specific variables
-await reader.read(undefined, ["name", "owner"]);
+await readStorage(provider, addr, layout, undefined, ["name", "owner"]);
 
 // read some keys of mappings
-await reader.read(["users[1]", "info.roles[admin]"]);
+await readStorage(provider, addr, layout, ["users[1]", "info.roles[admin]"]);
 ```
 
 ## Analysis of EVM Storage Slot
