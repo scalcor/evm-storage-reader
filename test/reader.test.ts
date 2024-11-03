@@ -104,10 +104,12 @@ describe("test readStorage", () => {
             },
         };
 
-        const result = await readStorage(provider2, addr, layout, [
-            "v6[0x4c5C749f5Fd9215186D07694c059d458333D5cDF]",
-            "v6[0xada7F54FF2cdce723b4B4c9CD57e4b99E48b151c]",
-        ]);
+        const result = await readStorage(provider2, addr, layout, {
+            mapKeys: [
+                "v6[0x4c5C749f5Fd9215186D07694c059d458333D5cDF]",
+                "v6[0xada7F54FF2cdce723b4B4c9CD57e4b99E48b151c]",
+            ],
+        });
         expect(result).toEqual(expected2);
     });
 
@@ -125,7 +127,7 @@ describe("test readStorage", () => {
             storage: vars.reduce((pv: Record<string, any>, cv: string) => ({ ...pv, [cv]: expected.storage[cv] }), {}),
         };
 
-        const result = await readStorage(provider, addr, layout, undefined, vars);
+        const result = await readStorage(provider, addr, layout, { vars });
         expect(result).toEqual(expected3);
     });
 });

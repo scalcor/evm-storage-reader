@@ -2,52 +2,89 @@
 
 This library reads and parses storages of an EVM contract.
 
-## Getting Started
-
-Install this package using your favorite package manager.
-
-```sh
-npm install git://github.com/scalcor/evm-storage-reader.git
-```
-
 ## Basic Usage
 
-```typescript
-import { ethers } from "ethers";
-import { readStorage } from "evm-storage-reader";
+```js
+const fs = require("fs");
+const layoutData = fs.readFileSync("./layout.json", "utf8");
+const layout = JSON.parse(layoutData);
 
-const provider = ethers.getDefaultProvider();
-const address = "0x29Eb3b7895cc2C1ADF6FF1f313307aCc8E2b6147"; // contract's address
-const layout = { // contract's storage layout
-  storage: [{ label: "name", offset: 0, slot: "0", type: "t_string_storage" }],
-  types: { t_string_storage: { encoding: "bytes", label: "string", numberOfBytes: "32" } },
-};
+const { ethers } = require("ethers");
+const { readStorage } = require("evm-storage-reader");
 
-const result = await readStorage(provider, addr, layout);
+// read token UNI
+const provider = new ethers.JsonRpcProvider("<YOUR_PROVIDER_ENDPOINT>");
+const address = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+
+const result = await readStorage(provider, address, layout);
+
+console.log(result);
+```
+
+Output:
+```js
+{
+  slots: {
+    '0x00': '0x0000000000000000000000000000000000000000033b2e3c9fd0803ce8000000',
+    '0x01': '0x0000000000000000000000001a9c8182c09f50c8318d769245bea52c32be35bc',
+    '0x02': '0x0000000000000000000000000000000000000000000000000000000065920080',
+    '0x03': '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x04': '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x05': '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x06': '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x07': '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x08': '0x0000000000000000000000000000000000000000000000000000000000000000'
+  },
+  storage: {
+    totalSupply: 1000000000000000000000000000n,
+    minter: '0x1a9C8182C09F50C8318d769245beA52c32BE35BC',
+    mintingAllowedAfter: 1704067200n,
+    allowances: 'mapping(address => mapping(address => uint96))',
+    balances: 'mapping(address => uint96)',
+    delegates: 'mapping(address => address)',
+    checkpoints: 'mapping(address => mapping(uint32 => struct Uni.Checkpoint))',
+    numCheckpoints: 'mapping(address => uint32)',
+    nonces: 'mapping(address => uint256)'
+  }
+}
 ```
 
 ## Storage Layout
 
-The solidyty compiler - `solc` - can generate a contract's storage layout.
+The solidity compiler - `solc` - can generate a contract's storage layout.
 
 ```sh
-solc --storage-layout contracts/MyContract.sol
+solc --storage-layout MyContract.sol
 ```
 
 ## Advanced Usage
 
-```typescript
-const reader = new StorageReader(provider, address, layout);
-
+```js
 // read from specific block
-await readStorage(provider, addr, layout, undefined, undefined, "finalized");
-await readStorage(provider, addr, layout, undefined, undefined, "0xab14df");
+await readStorage(provider, addr, layout, { block: "finalized" });
+await readStorage(provider, addr, layout, { block: "0xab14df" });
 
-// read specific variables
-await readStorage(provider, addr, layout, undefined, ["name", "owner"]);
+// read only specific variables
+await readStorage(provider, addr, layout, { vars: ["totalSupply", "minter"] });
 
 // read some keys of mappings
-await readStorage(provider, addr, layout, ["users[1]", "info.roles[admin]"]);
+const result = await readStorage(provider, addr, layout, {
+    vars: ["balances"],
+    mapKeys: ["balances[0x41653c7d61609D856f29355E404F310Ec4142Cfb]"],
+});
+```
+
+Output:
+```js
+{
+  slots: {
+    '0x04': '0x0000000000000000000000000000000000000000000000000000000000000000',
+    '0x39cc81e8503575681f717ceec21994967e960e95135fe29428b007a8a207ed97': '0x0000000000000000000000000000000000000000000000000009cc88c6c32ddd'
+  },
+  storage: {
+    balances: { '0x41653c7d61609D856f29355E404F310Ec4142Cfb': 2758162612694493n }
+  }
+}
 ```
 
 ## Analysis of EVM Storage Slot
@@ -70,7 +107,7 @@ Information about the variable type can be found in the `StorageType` pointed to
 
   For array types, `StorageType.base` exists, which holds type information for the array elements.
 
-  For structs, `StorageType.members` exists, which is an array of `StorageVariables`.
+  For structs, `StorageType.members` exists, which is an array of `StorageVariable`s.
 
 - Mapping
 
