@@ -1,6 +1,6 @@
 # EVM Storage Reader
 
-This library reads and parses storages of an EVM contract.
+This package reads and parses storages of an EVM contract.
 
 ## Basic Usage
 
@@ -10,7 +10,7 @@ const layoutData = fs.readFileSync("./layout.json", "utf8");
 const layout = JSON.parse(layoutData);
 
 const { ethers } = require("ethers");
-const { readStorage } = require("evm-storage-reader");
+const { readStorage } = require("@scalcor/evm-storage-reader");
 
 // read token UNI
 const provider = new ethers.JsonRpcProvider("<YOUR_PROVIDER_ENDPOINT>");
@@ -61,17 +61,19 @@ solc --storage-layout MyContract.sol
 
 ```js
 // read from specific block
-await readStorage(provider, addr, layout, { block: "finalized" });
-await readStorage(provider, addr, layout, { block: "0xab14df" });
+await readStorage(provider, address, layout, { block: "finalized" });
+await readStorage(provider, address, layout, { block: "0xab14df" });
 
 // read only specific variables
-await readStorage(provider, addr, layout, { vars: ["totalSupply", "minter"] });
+await readStorage(provider, address, layout, { vars: ["totalSupply", "minter"] });
 
-// read some keys of mappings
-const result = await readStorage(provider, addr, layout, {
+// also read some keys of mappings
+const result = await readStorage(provider, address, layout, {
     vars: ["balances"],
     mapKeys: ["balances[0x41653c7d61609D856f29355E404F310Ec4142Cfb]"],
 });
+
+console.log(result);
 ```
 
 Output:
